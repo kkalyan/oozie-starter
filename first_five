@@ -1,0 +1,10 @@
+one=`head -1 $1  | tail -1`
+two=`head -2 $1  | tail -1`
+three=`head -3 $1  | tail -1`
+four=`head -4 $1  | tail -1`
+five=`head -5 $1  | tail -1`
+echo one=$one;
+echo two=$two;
+echo three=$three;
+echo four=$four;
+echo five=$five;

@@ -1,0 +1,3 @@
+appRoot=ooziestarter
+hadoop fs -mkdir -p $appRoot
+hadoop fs -put -f /usr/share/dict/linux.words find_long_words.pig  first_five  workflow.xml  $appRoot/

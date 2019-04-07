@@ -1,0 +1,57 @@
+<workflow-app xmlns="uri:oozie:workflow:0.4" name="ooziestarter">
+<global>
+        <job-tracker>${jobTracker}</job-tracker>
+	<name-node>${nameNode}</name-node>
+	<configuration>
+	<property>
+		<name>oozie.action.sharelib.for.pig</name>
+	       <value>pig_current,hcat_current</value>
+	</property>
+	<property>
+       		<name>mapred.job.queue.name</name>
+               <value>${queueName}</value>
+                </property>
+	</configuration>
+</global>
+    <start to="pig"/>
+     <action name="pig">
+	<pig>
+     	    <prepare><delete path="${OUTPUT}"/></prepare>
+            <script>find_long_words.pig</script>
+       	    <param>INPUT=${INPUT}</param>
+            <param>OUTPUT=${OUTPUT}</param>
+        </pig>
+        <ok to="shell"/> <error to="fail"/>
+    </action>
+	<action name="shell">
+        <shell xmlns="uri:oozie:shell-action:0.3">
+            <exec>first_five</exec>
+	    <argument>input</argument>        
+            <file>${appRoot}/first_five#first_five</file>
+            <file>${INPUT}#input</file>
+            <capture-output/>
+        </shell>
+	<ok to="email"/> <error to="fail"/>
+    </action>
+
+<action name="email">
+        <email xmlns="uri:oozie:email-action:0.1">
+              <to>${email}</to>
+              <subject>Output of workflow ${wf:id()}</subject>
+              <body>
+one=${wf:actionData('shell')['one']}
+two=${wf:actionData('shell')['two']}
+three=${wf:actionData('shell')['three']}
+four=${wf:actionData('shell')['four']}
+five=${wf:actionData('shell')['five']}
+              </body>
+        </email>
+        <ok to="end"/>
+        <error to="end"/>
+    </action>
+
+    <kill name="fail">
+        <message>Pig failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+    </kill>
+    <end name="end"/>
+</workflow-app>
